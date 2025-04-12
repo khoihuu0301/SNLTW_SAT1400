@@ -7,7 +7,7 @@ from tkinter import Menu
 
 window = Tk()
 window.title("Đăng Ký Tài khoản")
-window.geometry("1366x768")  # Set the size of the window
+window.geometry("1600x900")  # Set the size of the window
 window.configure(background="light gray")
 
 menu = Menu(window)
