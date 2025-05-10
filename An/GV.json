@@ -1,0 +1,12 @@
+[
+    {
+        "ID": "0001", 
+        "ten": "Nguyen Van A"
+    },
+    
+    {"ID": "0002", 
+    "ten": "Tran Thi B"},
+    
+    {"ID": "0003", 
+    "ten": "Nguyen Minh D"}
+]
