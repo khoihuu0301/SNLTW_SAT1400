@@ -17,25 +17,24 @@ class QuanLyGiaoVien:
         self.root = root
         self.root.title("Quản Lý Giáo Viên")
         self.root.geometry("600x400")
-    
-        self.GV = []
-        with open("GV.json", "r") as file:
-            GV_data = json.load(file)
-            self.GV.extend(GV_data)
 
-        GV_id = []
-        for g in self.GV:
-            GV_id.append(g["ID"])
+        self.ten_file = "C:/Users/Teky Binh Thanh/Downloads/QLGV/QLGV/GV.json"
+        self.GV = self.doc_file_json()
+        print(self.GV)
 
-        cb1 = ttk.Combobox(values = GV_id, width = 10)  # Tạo Combobox
-        cb1.place(x=100, y =200)
-
+        self.tao_giao_dien()
 
     def tao_giao_dien(self):
         # Frame bên trái để nhập thông tin và các nút
         left_frame = tk.Frame(self.root)
         left_frame.pack(side="left", padx=20, pady=20)
 
+        # Cập nhật danh sách giáo viên từ file JSON
+        GV_id = [gv.ID for gv in self.GV]
+
+        self.cb1 = ttk.Combobox(values=GV_id, width=10)  # Tạo Combobox
+        self.cb1.place(x=50, y=50)
+        self.cb1.bind("<<ComboboxSelected>>", self.hien_thi_thong_tin)
 
         # Nhập ID giáo viên
         tk.Label(left_frame, text="ID giáo viên:").pack(pady=5)
@@ -58,12 +57,6 @@ class QuanLyGiaoVien:
         # Label hiển thị thông tin giáo viên
         self.info_label = tk.Label(right_frame, text="Thông tin giáo viên sẽ hiển thị tại đây", justify="left")
         self.info_label.pack()
-
-        # Khi chọn giáo viên trong combobox, hiển thị thông tin
-        self.combobox.bind("<<ComboboxSelected>>", self.hien_thi_thong_tin)
-
-        # Cập nhật Combobox với danh sách giáo viên từ file JSON
-        self.cap_nhat_combobox()
 
     def them_giao_vien(self):
         # Thêm giáo viên mới từ Entry widgets
@@ -89,13 +82,13 @@ class QuanLyGiaoVien:
 
     def xoa_giao_vien(self):
         # Xóa giáo viên được chọn trong combobox
-        selected_gv = self.combobox.get()
+        selected_gv = self.cb1.get()
         if not selected_gv:
             messagebox.showwarning("Chưa chọn giáo viên", "Vui lòng chọn giáo viên để xóa.")
             return
 
-        ID = selected_gv.split(" | ")[0].split(": ")[1]  # Lấy ID giáo viên từ chuỗi
-        self.GV = [gv for gv in self.GV if gv.ID != ID]
+        # Xóa giáo viên trong danh sách
+        self.GV = [gv for gv in self.GV if gv.ID != selected_gv]
         self.luu_file_json()
         self.cap_nhat_combobox()
 
@@ -108,15 +101,15 @@ class QuanLyGiaoVien:
 
     def cap_nhat_combobox(self):
         # Cập nhật combobox với danh sách giáo viên
-        self.combobox.set('')
-        self.combobox['values'] = [f"ID: {gv.ID} | Tên: {gv.ten}" for gv in self.GV]
+        self.cb1.set('')
+        self.cb1['values'] = [gv.ID for gv in self.GV]
 
     def hien_thi_thong_tin(self, event=None):
-        # Hiển thị thông tin giáo viên được chọn trong combobox
-        selected_gv = self.combobox.get()
+        # Lấy ID giáo viên được chọn trong combobox
+        selected_gv = self.cb1.get()
         if selected_gv:
-            ID = selected_gv.split(" | ")[0].split(": ")[1]  # Lấy ID giáo viên từ chuỗi
-            gv = next(gv for gv in self.GV if gv.ID == ID)
+            # Truy tìm giáo viên từ danh sách GV dựa trên ID
+            gv = next(gv for gv in self.GV if gv.ID == selected_gv)
             info = f"ID: {gv.ID}\nTên: {gv.ten}"
             self.info_label.config(text=info)
 
@@ -134,12 +127,13 @@ class QuanLyGiaoVien:
                     data = json.load(f)
                     # Xử lý dữ liệu từ JSON và tạo danh sách giáo viên
                     GV = [GiaoVien(item["ID"], item["ten"]) for item in data]
+                    print("GV:", GV)
                     return GV
                 except json.JSONDecodeError:
                     messagebox.showerror("Lỗi", "File JSON bị lỗi hoặc trống.")
                     return []
-        else:
-            return []  # Nếu không có file, trả về danh sách trống
+        return []  # Nếu không có file, trả về danh sách trống
+
 
 if __name__ == "__main__":
     root = tk.Tk()
