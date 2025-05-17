@@ -1,0 +1,25 @@
+[{
+    "id": "0001",
+    "name": "Trần Thị B",
+    "age": "15",
+    "class": "10A"
+},
+{
+    "id": "0002",
+    "name": "Lê Văn C",
+   "age": "15",
+    "class": "10A"
+},
+{
+    "id": "0003",
+    "name": "Phạm Thị D",
+   "age": "15",
+    "class": "10A"
+},    
+
+{
+    "id": "0004",
+    "name": "Nguyễn Văn A",
+    "age": "15",
+    "class": "10A"
+}]    
