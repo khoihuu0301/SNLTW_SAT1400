@@ -12,7 +12,7 @@ window.geometry("1500x800")  # Tăng kích thước cửa sổ
 window.configure(background="light gray")
 
 class Lop:
-    def __init__(self, id, name, time_start , end_time, teachers, students):
+    def __init__(self, id, name, time_start, end_time, teachers, students):
         self.id = id
         self.name = name
         self.time_start = time_start
@@ -21,8 +21,6 @@ class Lop:
         self.students = students
 
     def __str__(self):
-        # Hiển thị thông tin lớp với màu xanh dương nhạt (light blue) trong terminal (nếu có)
-        # Trong tkinter, màu sắc sẽ được xử lý ở nơi hiển thị, không phải ở đây
         info = (
             f"\033[96mId: {self.id}\n"
             f"Name: {self.name}\n"
@@ -32,6 +30,60 @@ class Lop:
             f"HS: {', '.join(self.students)}\033[0m"
         )
         return info
+
+    @staticmethod
+    def load_all(filepath):
+        classes = []
+        if os.path.exists(filepath):
+            try:
+                with open(filepath, "r", encoding="utf-8") as file:
+                    data = json.load(file)
+                    for c in data:
+                        classes.append(
+                            Lop(
+                                c.get("Id", ""),
+                                c.get("Name", ""),
+                                c.get("Time start", ""),
+                                c.get("Time end", ""),
+                                c.get("GV", []),
+                                c.get("HS", []),
+                            )
+                        )
+            except Exception:
+                messagebox.showerror("Lỗi", f"Tệp {filepath} không đúng định dạng JSON!")
+        else:
+            messagebox.showerror("Lỗi", f"Tệp {filepath} không tồn tại!")
+        return classes
+
+    @staticmethod
+    def save_all(classes, filepath):
+        data = []
+        for c in classes:
+            data.append({
+                "Id": c.id,
+                "Name": c.name,
+                "Time start": c.time_start,
+                "Time end": c.end_time,
+                "GV": c.teachers,
+                "HS": c.students
+            })
+        with open(filepath, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=4)
+
+    @staticmethod
+    def add_class(new_class, filepath):
+        classes = Lop.load_all(filepath)
+        classes.append(new_class)
+        Lop.save_all(classes, filepath)
+
+    @staticmethod
+    def delete_class(class_id, filepath):
+        classes = Lop.load_all(filepath)
+        new_classes = [c for c in classes if str(c.id) != str(class_id)]
+        if len(new_classes) == len(classes):
+            return False
+        Lop.save_all(new_classes, filepath)
+        return True
 
 def open_add_class_window():
     add_window = Toplevel(window)
@@ -65,7 +117,6 @@ def open_add_class_window():
     entry6.grid(row=5, column=1, padx=10, pady=10, sticky="w")
 
     def add_to_json():
-        # Lấy dữ liệu từ các entry
         id_val = entry1.get().strip()
         name_val = entry2.get().strip()
         time_start_val = entry3.get().strip()
@@ -73,7 +124,6 @@ def open_add_class_window():
         gv_val = entry5.get().strip()
         hs_val = entry6.get().strip()
 
-        # Kiểm tra dữ liệu
         if not id_val or not name_val or not time_start_val or not time_end_val or not gv_val or not hs_val:
             messagebox.showerror("Lỗi", "Vui lòng nhập đầy đủ thông tin!")
             return
@@ -81,25 +131,15 @@ def open_add_class_window():
             messagebox.showerror("Lỗi", "Id phải là số!")
             return
 
-        new_class = {
-            "Id": id_val,
-            "Name": name_val,
-            "Time start": time_start_val,
-            "Time end": time_end_val,
-            "GV": [i.strip() for i in gv_val.split(",") if i.strip()],
-            "HS": [i.strip() for i in hs_val.split(",") if i.strip()]
-        }
-        # Đọc dữ liệu cũ
-        try:
-            with open(r"C:\Users\ASUS\OneDrive\Máy tính\Code\SNLTW_SAT1400\Bao\Class.json", "r", encoding="utf-8") as f:
-                data = json.load(f)
-        except Exception:
-            data = []
-        # Thêm dữ liệu mới
-        data.append(new_class)
-        # Ghi lại file
-        with open(r"C:\Users\ASUS\OneDrive\Máy tính\Code\SNLTW_SAT1400\Bao\Class.json", "w", encoding="utf-8") as f:
-            json.dump(data, f, ensure_ascii=False, indent=4)
+        new_class = Lop(
+            id_val,
+            name_val,
+            time_start_val,
+            time_end_val,
+            [i.strip() for i in gv_val.split(",") if i.strip()],
+            [i.strip() for i in hs_val.split(",") if i.strip()]
+        )
+        Lop.add_class(new_class, r"C:\Users\ASUS\OneDrive\Máy tính\Code\SNLTW_SAT1400\Bao\Class.json")
         messagebox.showinfo("Thành công", "Đã thêm lớp học mới!")
         add_window.destroy()
 
@@ -120,18 +160,10 @@ def open_delete_class_window():
         if not id_to_delete:
             messagebox.showerror("Lỗi", "Vui lòng nhập Id lớp!")
             return
-        try:
-            with open(r"C:\Users\ASUS\OneDrive\Máy tính\Code\SNLTW_SAT1400\Bao\Class.json", "r", encoding="utf-8") as f:
-                data = json.load(f)
-        except Exception:
-            messagebox.showerror("Lỗi", r"Không đọc được filer C:\Users\ASUS\OneDrive\Máy tính\Code\SNLTW_SAT1400\Bao\Class.json!")
-            return
-        new_data = [c for c in data if str(c.get("Id")) != id_to_delete]
-        if len(new_data) == len(data):
+        result = Lop.delete_class(id_to_delete, r"C:\Users\ASUS\OneDrive\Máy tính\Code\SNLTW_SAT1400\Bao\Class.json")
+        if not result:
             messagebox.showerror("Lỗi", "Không tìm thấy lớp với Id này!")
             return
-        with open(r"C:\Users\ASUS\OneDrive\Máy tính\Code\SNLTW_SAT1400\Bao\Class.json", "w", encoding="utf-8") as f:
-            json.dump(new_data, f, ensure_ascii=False, indent=4)
         messagebox.showinfo("Thành công", f"Đã xóa lớp có Id {id_to_delete}!")
         delete_window.destroy()
 
@@ -151,18 +183,8 @@ label2 = Label(window, text="Lớp học", bg="light gray", font="Times 28")
 label2.grid(row=1, column=0, padx=20, pady=20, sticky="w")
 
 # Load data
-Classes = []
-if os.path.exists(r"C:\Users\ASUS\OneDrive\Máy tính\Code\SNLTW_SAT1400\Bao\Class.json"):
-    try:
-        with open(r"C:\Users\ASUS\OneDrive\Máy tính\Code\SNLTW_SAT1400\Bao\Class.json", "r") as file:
-            classes_data = json.load(file)
-            Classes.extend(classes_data)
-    except json.JSONDecodeError:
-        messagebox.showerror("Lỗi", r"Tệpr C:\Users\ASUS\OneDrive\Máy tính\Code\SNLTW_SAT1400\Bao\Class.json không đúng định dạng JSON!")
-else:
-    messagebox.showerror("Lỗi", r"Tệpr C:\Users\ASUS\OneDrive\Máy tính\Code\SNLTW_SAT1400\Bao\Class.json không tồn tại!")
-
-class_id = [str(c.get("Id", "Unknown")) for c in Classes]
+Classes = Lop.load_all(r"C:\Users\ASUS\OneDrive\Máy tính\Code\SNLTW_SAT1400\Bao\Class.json")
+class_id = [str(c.id) for c in Classes]
 
 cb1 = Combobox(window, values=class_id, width=18, font=("Arial", 22), state="readonly")
 cb1.grid(row=1, column=1, padx=20, pady=20, sticky="w")
@@ -202,27 +224,20 @@ button2.grid(row=4, column=1, padx=20, pady=20, sticky="ew")
 # button3.grid(row=4, column=2, padx=20, pady=20, sticky="ew")
 
 def hien_thi_thong_tin(id):
-    # Xóa nội dung cũ
     entry_id.delete("1.0", "end")
     # Không xóa entry_ten để giữ nguyên vị trí class name
-    # entry_ten.delete("1.0", "end")
-    # Tìm lớp học theo id
     for c in Classes:
-        if str(c.get("Id", "")) == str(id):
-            entry_id.insert("1.0", c.get("Id", ""))
+        if str(c.id) == str(id):
+            entry_id.insert("1.0", c.id)
             # Không thay đổi entry_ten để giữ nguyên vị trí class name
-            # entry_ten.insert("1.0", c.get("Name", ""))
-            Label4.config(text=", ".join(c.get("GV", [])))
-            # Hiển thị danh sách HS trong ScrolledText, mỗi học sinh 1 dòng, có dấu phẩy
+            Label4.config(text=", ".join(c.teachers))
             HSBox.config(state=NORMAL)
             HSBox.delete("1.0", END)
-            HSBox.insert(END, ",\n".join(c.get("HS", [])))
+            HSBox.insert(END, ",\n".join(c.students))
             HSBox.config(state=DISABLED)
             break
     else:
         entry_id.insert("1.0", "")
-        # Không thay đổi entry_ten để giữ nguyên vị trí class name
-        # entry_ten.insert("1.0", "")
         Label4.config(text="")
         HSBox.config(state=NORMAL)
         HSBox.delete("1.0", END)
