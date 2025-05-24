@@ -11,6 +11,28 @@ window.title("Đăng Ký Tài khoản")
 window.geometry("1500x800")  # Tăng kích thước cửa sổ
 window.configure(background="light gray")
 
+class Lop:
+    def __init__(self, id, name, time_start , end_time, teachers, students):
+        self.id = id
+        self.name = name
+        self.time_start = time_start
+        self.end_time = end_time
+        self.teachers = teachers
+        self.students = students
+
+    def __str__(self):
+        # Hiển thị thông tin lớp với màu xanh dương nhạt (light blue) trong terminal (nếu có)
+        # Trong tkinter, màu sắc sẽ được xử lý ở nơi hiển thị, không phải ở đây
+        info = (
+            f"\033[96mId: {self.id}\n"
+            f"Name: {self.name}\n"
+            f"Time start: {self.time_start}\n"
+            f"Time end: {self.end_time}\n"
+            f"GV: {', '.join(self.teachers)}\n"
+            f"HS: {', '.join(self.students)}\033[0m"
+        )
+        return info
+
 def open_add_class_window():
     add_window = Toplevel(window)
     add_window.title("Thêm lớp học mới")
