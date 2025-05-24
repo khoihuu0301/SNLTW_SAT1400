@@ -1,14 +1,20 @@
 [
     {
         "ID": "0001",
-        "ten": "Nguyen Van A"
-    },
-    {
-        "ID": "0002",
-        "ten": "Tran Thi B"
+        "ten": "Nguyen Van A",
+        "mon": "Sinh Hoc",
+        "nam_sinh": "1995"
     },
     {
         "ID": "0003",
-        "ten": "Nguyen Minh D"
+        "ten": "Nguyen Thi Lan",
+        "mon": "Tin Hoc",
+        "nam_sinh": "1990"
+    },
+    {
+        "ID": "0002",
+        "ten": "Tran Thi B",
+        "mon": "Toan Hoc",
+        "nam_sinh": "2000"
     }
 ]
