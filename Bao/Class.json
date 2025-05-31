@@ -1,0 +1,44 @@
+[
+    {
+        "Id": 3,
+        "Name": "SNLTW",
+        "Time start": "7:00",
+        "Time end": "10:00",
+        "GV": [
+            "Trần Thị Lan"
+        ],
+        "HS": [
+            "Lê Thành Công",
+            "Nguyễn Thị Bích",
+            "Nguyễn Văn Dũng",
+            "Nguyễn Thị Hằng",
+            "Nguyễn Văn Hậu",
+            "Nguyễn Thị Hương",
+            "Nguyễn Văn Khải",
+            "Nguyễn Thị Lan",
+            "Nguyễn Văn Minh",
+            "Nguyễn Thị Nga"
+        ]
+    },
+    {
+        "Id": "4",
+        "Name": "SNLTW",
+        "Time start": "7:00",
+        "Time end": "10:00",
+        "GV": [
+            "Lại Văn Hùng"
+        ],
+        "HS": [
+            "Nguyễn Văn An",
+            "Nguyễn Thị Bích",
+            "Nguyễn Văn Cường",
+            "Nguyễn Thị Dung",
+            "Nguyễn Văn Dũng",
+            "Nguyễn Thị Hằng",
+            "Nguyễn Văn Hậu",
+            "Nguyễn Thị Hương",
+            "Nguyễn Văn Khải",
+            "Nguyễn Thị Lan"
+        ]
+    }
+]
