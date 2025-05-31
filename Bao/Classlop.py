@@ -228,11 +228,11 @@ button2.grid(row=4, column=1, padx=20, pady=20, sticky="ew")
 
 def hien_thi_thong_tin(id):
     entry_id.delete("1.0", "end")
-    # Không xóa entry_ten để giữ nguyên vị trí class name
+    entry_ten.delete("1.0", "end")  # Thêm dòng này để xóa nội dung cũ của class name
     for c in Classes:
         if str(c.id) == str(id):
             entry_id.insert("1.0", c.id)
-            # Không thay đổi entry_ten để giữ nguyên vị trí class name
+            entry_ten.insert("1.0", c.name)  # Thêm dòng này để hiển thị class name
             Label4.config(text=", ".join(c.teachers))
             HSBox.config(state=NORMAL)
             HSBox.delete("1.0", END)
@@ -241,6 +241,7 @@ def hien_thi_thong_tin(id):
             break
     else:
         entry_id.insert("1.0", "")
+        entry_ten.delete("1.0", "end")  # Đảm bảo xóa class name nếu không tìm thấy
         Label4.config(text="")
         HSBox.config(state=NORMAL)
         HSBox.delete("1.0", END)
