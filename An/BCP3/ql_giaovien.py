@@ -1,21 +1,22 @@
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import messagebox
 import json, os
 from giaovien import GiaoVien
+
+FONT = ("Times New Roman", 20)
 
 class QuanLyGiaoVien:
     def __init__(self, root):
         self.root = root
         self.root.title("Quản Lý Giáo Viên")
-        self.root.geometry("800x300")
+        self.root.geometry("1200x600")  # Tăng kích thước cửa sổ cho phù hợp với font lớn
         self.ten_file = "GV.json"
         self.GV = self.doc_file_json()
         print(self.GV)
         self.tao_giao_dien()
 
     def refresh(self):
-        self.listbox.delete(0,tk.END)
-        
+        self.listbox.delete(0, tk.END)
         for t in self.GV:
             self.listbox.insert(tk.END, f'{t.ID} - {t.ten}')
 
@@ -27,44 +28,39 @@ class QuanLyGiaoVien:
         except:
             return None
 
-
     def tao_giao_dien(self):
-        # left = tk.Frame(self.root)
-        # left.pack(side="left", fill="y", padx=20, pady=20)
-
-        self.listbox = tk.Listbox(self.root, width=80)
-        self.listbox.place(x= 260, y= 75)
+        self.listbox = tk.Listbox(self.root, width=40, font=FONT)
+        self.listbox.place(x=550, y=100)
         self.refresh()
-        self.listbox.bind("<<ListboxSelect>>", self.hien_thi_thong_tin )
-    
-        ttk.Label(self.root, justify="left",width=20, background="#f0f0f0", text="Mã giáo viên:").place(y=20, x=10)
-        self.id_entry = ttk.Entry(self.root, width= 30)
-        self.id_entry.place(x= 10, y=40)
+        self.listbox.bind("<<ListboxSelect>>", self.hien_thi_thong_tin)
 
-        ttk.Label(self.root, justify="left",width=20, background="#f0f0f0", text="Tên giáo viên:").place(y=75, x=10)
-        self.ten_entry = ttk.Entry(self.root, width= 30)
-        self.ten_entry.place(x=10, y=95)
+        # Labels và Entries
+        tk.Label(self.root, text="Mã giáo viên:", font=FONT, bg="#f0f0f0").place(y=20, x=10)
+        self.id_entry = tk.Entry(self.root, width=20, font=FONT)
+        self.id_entry.place(x=10, y=70)
 
+        tk.Label(self.root, text="Tên giáo viên:", font=FONT, bg="#f0f0f0").place(y=130, x=10)
+        self.ten_entry = tk.Entry(self.root, width=20, font=FONT)
+        self.ten_entry.place(x=10, y=180)
 
-        style = ttk.Style()
-        style.theme_use("clam")
-        style.configure("BtnAdd.TButton", background="green", foreground="black")
-        ttk.Button(self.root, text="Thêm", style="BtnAdd.TButton", command=self.them_giao_vien).place(y=200, x=10)
-        style.configure("BtnDelete.TButton", background="red", foreground="black")
-        ttk.Button(self.root, text="Xoá", style="BtnDelete.TButton", command=self.xoa_giao_vien).place(y=200, x=110)
-        # ttk.Button(self.root, text="Làm mới", command=self.refresh).place(y=260, x=240)
+        # Buttons
+        self.btn_them = tk.Button(self.root, text="Thêm", font=FONT, bg="green", command=self.them_giao_vien)
+        self.btn_them.place(y=250, x=10)
 
-        self.cb1 = ttk.Combobox(self.root, width=28, values=[gv.ID for gv in self.GV])
-        self.cb1.place(y=150, x=10)
-        self.cb1.bind("<<ComboboxSelected>>", self.hien_thi_thong_tin)
+        self.btn_xoa = tk.Button(self.root, text="Xoá", font=FONT, bg="red", command=self.xoa_giao_vien)
+        self.btn_xoa.place(y=250, x=200)
 
-        # right = tk.Frame(self.root, width= 50)
-        # right.place(x=200, y=10)
+        # Combobox (dùng tk.OptionMenu để dễ set font hơn ttk.Combobox)
+        tk.Label(self.root, text="Chọn GV để xoá:", font=FONT).place(y=330, x=10)
+        self.selected_gv = tk.StringVar(self.root)
+        self.selected_gv.set('')
+        self.option_menu = tk.OptionMenu(self.root, self.selected_gv, *[gv.ID for gv in self.GV])
+        self.option_menu.config(font=FONT, width=15)
+        self.option_menu.place(y=380, x=10)
 
-
-
-        self.info_label = ttk.Label(self.root, text="Thông tin giáo viên", justify="left")
-        self.info_label.place(x= 260, y= 20)
+        # Thông tin giáo viên
+        self.info_label = tk.Label(self.root, text="Thông tin giáo viên", font=FONT, justify="left")
+        self.info_label.place(x=550, y=20)
 
     def them_giao_vien(self):
         ID, ten = self.id_entry.get().strip(), self.ten_entry.get().strip()
@@ -76,19 +72,19 @@ class QuanLyGiaoVien:
             return
         self.GV.append(GiaoVien(ID, ten))
         self.luu_file_json()
-        self.cap_nhat_combobox()
+        self.cap_nhat_option_menu()
         self.id_entry.delete(0, tk.END)
         self.ten_entry.delete(0, tk.END)
         self.refresh()
 
     def xoa_giao_vien(self):
-        selected = self.cb1.get()
+        selected = self.selected_gv.get()
         if not selected:
             messagebox.showwarning("Chưa chọn", "Chọn giáo viên cần xoá.")
             return
         self.GV = [gv for gv in self.GV if gv.ID != selected]
         self.luu_file_json()
-        self.cap_nhat_combobox()
+        self.cap_nhat_option_menu()
         self.info_label.config(text="Thông tin giáo viên")
         self.id_entry.delete(0, tk.END)
         self.ten_entry.delete(0, tk.END)
@@ -103,9 +99,12 @@ class QuanLyGiaoVien:
     def kiem_tra_trung_ID(self, ID):
         return any(gv.ID == ID for gv in self.GV)
 
-    def cap_nhat_combobox(self):
-        self.cb1.set('')
-        self.cb1['values'] = [gv.ID for gv in self.GV]
+    def cap_nhat_option_menu(self):
+        menu = self.option_menu["menu"]
+        menu.delete(0, "end")
+        for gv in self.GV:
+            menu.add_command(label=gv.ID, command=lambda value=gv.ID: self.selected_gv.set(value))
+        self.selected_gv.set('')
 
     def luu_file_json(self):
         with open(self.ten_file, "w", encoding="utf-8") as f:
@@ -119,3 +118,9 @@ class QuanLyGiaoVien:
             except:
                 messagebox.showerror("Lỗi", "File JSON lỗi.")
         return []
+
+# Nếu chạy file trực tiếp:
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = QuanLyGiaoVien(root)
+    root.mainloop()
