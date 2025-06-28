@@ -29,7 +29,7 @@ win = pygame.display.set_mode((400, 300))
 pygame.display.set_caption("Color Switch Car")
 
 
-class Car:
+class Basket:
     def __init__(self):
         self.colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255)]  
         self.color_index = 0
@@ -44,36 +44,43 @@ class Car:
             self.color_index = (self.color_index + 1) % len(self.colors)
         elif color == 'prev':
             self.color_index = (self.color_index - 1) % len(self.colors)
-    def move(self,surface,mapping="arrow"):
-        running = True
-        if mapping == "arrow":
+    # def move(self,surface,mapping="arrow"):
+    #     running = True
+    #     if mapping == "arrow":
         
-            while running:
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        running = False
-                # elif event.type == pygame.KEYDOWN:
-                #     if event.key in [pygame.K_RIGHT, pygame.K_DOWN]:
-                #         car.change_color('next')
-                #     elif event.key in [pygame.K_LEFT, pygame.K_UP]:
-                #         car.change_color('prev')
-                keys = pygame.key.get_pressed()
-                if keys [pygame.K_LEFT]:
-                    self.x -= speed
-                if keys [pygame.K_RIGHT]:
-                    self.x += speed
-                if keys [pygame.K_UP]:
-                    self.y -= speed
-                if keys [pygame.K_DOWN]:
-                    self.y += speed 
-                self.x= max(0, min(WIDTH - SQUARE_SIZE,self.x))
-                self.Y=max(0, min(WIDTH - SQUARE_SIZE,self.y))    
-                surface.fill((30,30,30))
-                self.draw(surface)
-                pygame.display.flip()
-                clock.tick(60)
-
-car = Car()
+    #         while running:
+    #             for event in pygame.event.get():
+    #                 if event.type == pygame.QUIT:
+    #                     running = False
+    #             # elif event.type == pygame.KEYDOWN:
+    #             #     if event.key in [pygame.K_RIGHT, pygame.K_DOWN]:
+    #             #         car.change_color('next')
+    #             #     elif event.key in [pygame.K_LEFT, pygame.K_UP]:
+    #             #         car.change_color('prev')
+    #             keys = pygame.key.get_pressed()
+    #             if keys [pygame.K_LEFT]:
+    #                 self.x -= speed
+    #             if keys [pygame.K_RIGHT]:
+    #                 self.x += speed
+    #             if keys [pygame.K_UP]:
+    #                 self.y -= speed
+    #             if keys [pygame.K_DOWN]:
+    #                 self.y += speed 
+    #             self.x= max(0, min(WIDTH - SQUARE_SIZE,self.x))
+    #             self.Y=max(0, min(WIDTH - SQUARE_SIZE,self.y))    
+    #             surface.fill((30,30,30))
+    #             self.draw(surface)
+    #             pygame.display.flip()
+    #             clock.tick(60)
+        def update(direction,self):
+            if direction== "X vuong":
+                self.y += speed
+            if direction=="len":
+                self.y -= speed
+                self.x -= "trai"
+                self.x += " phai"
+            
+basket=Basket()
 x,y=0,0
 SQUARE_SIZE=50
 WIDTH=500
@@ -83,8 +90,32 @@ clock = pygame.time.Clock()
 
         
 win.fill((255, 255, 255))  
-car.move(win)
+basket.move(win)
 
+    #Yvuong=Ytron + radius 
+    # Xvuong + Xtron < Xvuong + radius
+class Ball:
+     def __init__(self):
+        self.colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255)]  
+        self.color_index = 0
+        self.x=0
+        self.y=0
+        self.speed=5
+        self.radius=25
+
+     def draw(self, surface):
+        pygame.draw.circle(surface, self.colors[self.color_index],(self.x,self.y),radius=25)     
+     def move(self):
+        self.y += self.speed
+        self.x -= self.speed
+     def is_caught_by(self, basket: Basket):
+        return (
+            basket.y <= self.y + self.radius <= basket.y + basket.height and
+            basket.x <= self.x <= basket.x + basket.width
+        )
+        
+        
+basket = Basket()
+ball = Ball()
 pygame.display.update()
-
 pygame.quit()
