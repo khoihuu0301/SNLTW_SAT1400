@@ -1,5 +1,6 @@
 import pygame
-from car import Car
+from car import Car, Car2
+# from car2 import Car2
 
 pygame.init()
 win = pygame.display.set_mode((500, 500))
@@ -40,8 +41,10 @@ done = False
     # pygame.draw.rect(win, Porsche.color, pygame.Rect(x, y, 90, 90))  # Vẽ Porsche với màu mới
 
 
-
+BMW = Car2(surface=win, color=G, speed=1, size = 50, x= 30, y= 50)
 Porsche = Car(color=R, speed=1, size = 50, x= 0, y= 0)
 Porsche.move(win, mapping='arrow')
+
+
 
 pygame.quit()
