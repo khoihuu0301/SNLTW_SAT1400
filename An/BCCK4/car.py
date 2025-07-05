@@ -35,7 +35,7 @@ class Car2:
         self.y = y
         self.draw(surface)
     def draw( self, surface):
-        pygame.draw.circle(surface, (0, 200, 255), (self.x, self.y), radius=self.size)
+        pygame.draw.rect(surface, (0, 200, 255), (self.x, self.y, self.size, self.size))
     
     speed = 1 
     x,y =0,0

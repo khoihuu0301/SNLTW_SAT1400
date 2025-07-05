@@ -113,8 +113,18 @@ class Ball:
             basket.y <= self.y + self.radius <= basket.y + basket.height and
             basket.x <= self.x <= basket.x + basket.width
         )
-        
-        
+     def points (self):
+        basket_rect= pygame.Rect(self.x,self.y,basket.size,basket.size )
+        dist_x = abs(ball.x - basket_rect.centerx)
+        dist_y = abs(ball.y - basket_rect.centery)
+        if dist_x <= (basket.size // 2+ ball.size) and dist_y <= (basket.size // 2+ ball.size):
+            font = pygame.font.SysFont(None, 48)
+            text = font.render("Game Over!", True, (255,0,0))
+
+
+running = True
+clock = pygame.time.Clock()
+
 basket = Basket()
 ball = Ball()
 pygame.display.update()
