@@ -1,93 +1,142 @@
 import pygame
 import random
+import os
+import json
 from car import Car, Car2
-from car import Car2, Car
 
-if __name__ == "__main__":
-    pygame.init()
-    WIDTH, HEIGHT = 400,600
-    screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    clock =pygame.time.Clock()
+# === SETUP ===
+pygame.init()
+WIDTH, HEIGHT = 400, 600
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("F1 Street Dodger")
+clock = pygame.time.Clock()
 
-    car_size = 40
-    player = Car(color=(0, 200, 255), speed = 5, size = car_size, x=WIDTH//2 - car_size//2, y = HEIGHT - car_size - 10 )
-    player.x = WIDTH//2 - car_size//2
-    player.y = HEIGHT - car_size - 10
+# === FONT & FILE ===
+font = pygame.font.SysFont(None, 36)
+HS_FILE = "highscore.json"
+highscore = 0
+if os.path.exists(HS_FILE):
+    with open(HS_FILE, "r") as f:
+        try:
+            highscore = json.load(f).get("highscore", 0)
+        except:
+            highscore = 0
 
-    car2_size = 40 
-    car2_speed = 5
-    car2_x = random.randint(0, WIDTH - car2_size)
-    car2_y = -car2_size
-    car2 = Car2(screen, color=(255,0,0), speed=car2_speed, size=car2_size, x=car2_x, y=car2_y)
+# === GAME BIẾN ===
+score = 0
+game_over = False
 
-    running = True
-    while running:
-        clock.tick(60)
-        screen.fill((0,0,0))    
+line_y = 0
+line_speed = 5
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
+car_size = 40
+player = Car(color=(0, 200, 255), speed=8, size=car_size, x=WIDTH//2 - car_size//2, y=HEIGHT - car_size - 10)
 
+obs_list = []
+obs_timer = 0
+
+# === Functions ===
+def draw_track(screen, line_y):
+    screen.fill((40, 40, 40))  # mặt đường
+
+    # Vạch chia làn trắng giữa
+    for i in range(0, HEIGHT, 40):
+        pygame.draw.rect(screen, (255, 255, 255), (WIDTH//2 - 5, (i + line_y) % HEIGHT, 10, 30))
+
+    # Lề đường đỏ trắng
+    for i in range(0, HEIGHT, 40):
+        color = (255, 0, 0) if (i//40) % 2 == 0 else (255, 255, 255)
+        pygame.draw.rect(screen, color, (0, i, 10, 20))                 # Lề trái
+        pygame.draw.rect(screen, color, (WIDTH - 10, i, 10, 20))        # Lề phải
+
+# === GAME LOOP ===
+running = True
+while running:
+    clock.tick(60)
+    screen.fill((30, 30, 30))  # Nền tối như mặt đường
+
+    line_y += line_speed
+
+    draw_track(screen, line_y)
+
+    # === VẼ LINE ĐƯỜNG ĐUA ===
+    line_y += line_speed
+    for i in range(0, HEIGHT, 40):
+        pygame.draw.rect(screen, (255, 255, 255), (WIDTH//2 - 5, (i + line_y) % HEIGHT, 10, 20))
+    car2_size = 40
+    car2_speed = 6
+
+    # === SPAWN OBS ===
+    obs_timer += 1
+    if obs_timer >= 40:
+        car2_x = random.randint(0, WIDTH - car2_size)
+        car2_y = -car2_size
+        obs_timer=0
+        obs_list.append(Car2(screen, color=(232, 123, 0), speed=car2_speed, size=car2_size, x=car2_x, y=car2_y))
+
+    # === SỰ KIỆN ===
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+        if event.type == pygame.KEYDOWN and game_over:
+            if event.key == pygame.K_r:
+                # RESET GAME
+                score = 0
+                game_over = False
+                player.x = WIDTH//2 - car_size//2
+                player.y = HEIGHT - car_size - 10
+                obs_list.clear()
+
+    if not game_over:
+        # === ĐIỀU KHIỂN ===
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT] and player.x > 0:
+        if keys[pygame.K_a] and player.x > 0:
             player.update("trai")
-        if keys[pygame.K_RIGHT] and player.x < WIDTH - car_size:
+        if keys[pygame.K_d] and player.x < WIDTH - car_size:
             player.update("phai")
-        if keys[pygame.K_UP] and player.y > 0:
+        if keys[pygame.K_w] and player.y > 0:
             player.update("len")
-        if keys[pygame.K_DOWN] and player.x < HEIGHT - car_size:
+        if keys[pygame.K_s] and player.y < HEIGHT - car_size:
             player.update("xuong")
 
-        car2.y += car2.speed
-        if car2.y > HEIGHT:
-            car2.x = random.randint(0, WIDTH - car2_size)
-            car2.y = -car2.size
+        # === UPDATE XE ĐỊCH ===
+        for car2 in obs_list:
+            car2.y += car2.speed
+            if car2.y > HEIGHT:
+                obs_list.remove(car2)
+                score += 1
 
-        player.draw(screen)
+        # === VA CHẠM ===
+        player_rect = pygame.Rect(player.x, player.y, player.size, player.size)
+        for car2 in obs_list:
+            obs_rect = pygame.Rect(car2.x, car2.y, car2.size, car2.size)
+            if player_rect.colliderect(obs_rect):
+                if score > highscore:
+                    highscore = score
+                    with open(HS_FILE, "w") as f:
+                        json.dump({"highscore": highscore}, f)
+                game_over = True
+
+    # === VẼ XE ===
+    player.draw(screen)
+    for car2 in obs_list:
         car2.draw(screen)
 
-        player_rect = pygame.Rect(player.x, player.y, player.size, player.size)
-        dist_x = abs(car2.x + car2_size // 2 - player_rect.centerx)
-        dist_y = abs(car2.y + car2_size // 2 - player_rect.centery)
-        if dist_x <= (player.size // 2 + car2.size) and dist_y <= (player.size // 2 + car2.size):
-            font = pygame.font.SysFont(None, 48)
-            text = font.render("Game Over!", True, (255, 0, 0))
-            screen.blit(text, (WIDTH//2 - text.get_width()//2, HEIGHT//2 - text.get_height()//2))
-            pygame.display.flip()
-            pygame.time.wait(2000)
-            running = False
-    
-        pygame.display.update()
-# i = 0
 
-# while not done:
-#     for event in pygame.event.get():
-#         if event.type == pygame.QUIT:
-#             done = True
+    # === VẼ SCORE & HIGH SCORE ===
+    score_text = font.render(f"Score: {score}", True, (255, 255, 0))
+    hs_text = font.render(f"High Score: {highscore}", True, (0, 255, 255))
+    screen.blit(score_text, (10, 10))
+    screen.blit(hs_text, (10, 40))
 
-#         if event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT:
-#             i = i + 1
-#             if i >= len(color_list):
-#                 i = 0  # Reset i về 0 nếu vượt quá số màu trong color_list
-#             Porsche.change_color(color_list[i])  # Thay đổi màu của Porsche
-            
-#         if event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT:
-#             i = i - 1
-#             if i < 0:  # Nếu i nhỏ hơn 0, reset lại về chỉ số cuối của color_list
-#                 i = len(color_list) - 1
-#             Porsche.change_color(color_list[i])  # Thay đổi màu của Porsche
+    # === GAME OVER MÀN HÌNH ===
+    if game_over:
+        text = font.render("Game Over!", True, (255, 0, 0))
+        restart = font.render("Press R to Restart", True, (255, 255, 255))
+        screen.blit(text, (WIDTH//2 - text.get_width()//2, HEIGHT//2 - text.get_height()//2))
+        screen.blit(restart, (WIDTH//2 - restart.get_width()//2, HEIGHT//2 + 30))
 
-
-    # # Vẽ lại màn hình và Porsche với màu mới
-    # win.fill((255, 255, 255))  # Xóa màn hình (màu nền trắng)
-    # pygame.draw.rect(win, Porsche.color, pygame.Rect(x, y, 90, 90))  # Vẽ Porsche với màu mới
-
-
-# BMW = Car2(surface=win, color=G, speed=1, size = 50, x= 30, y= 50)
-# Porsche = Car(color=R, speed=1, size = 50, x= 0, y= 0)
-# Porsche.move(win, mapping='arrow')
-
-
+    pygame.display.update()
 
 pygame.quit()
