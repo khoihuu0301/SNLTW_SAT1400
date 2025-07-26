@@ -6,7 +6,7 @@ from car import Car, Car2
 
 # === SETUP ===
 pygame.init()
-WIDTH, HEIGHT = 400, 600
+WIDTH, HEIGHT = 500, 700
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("F1 Street Dodger")
 clock = pygame.time.Clock()
@@ -29,8 +29,12 @@ game_over = False
 line_y = 0
 line_speed = 5
 
-car_size = 40
-player = Car(color=(0, 200, 255), speed=8, size=car_size, x=WIDTH//2 - car_size//2, y=HEIGHT - car_size - 10)
+PLAYER_IMG = r"C:\Users\Teky Binh Thanh\Desktop\BCCK4\F1.png"
+ENEMY_IMG = r"C:\Users\Teky Binh Thanh\Desktop\BCCK4\Car.png"
+
+car_width = 50
+car_height = 100
+player = Car(color=(0, 200, 255), speed=8, width=car_width, height=car_height, x=WIDTH//2 - car_width//2, y=HEIGHT - car_height - 10,  image_path= PLAYER_IMG)
 
 obs_list = []
 obs_timer = 0
@@ -63,16 +67,18 @@ while running:
     line_y += line_speed
     for i in range(0, HEIGHT, 40):
         pygame.draw.rect(screen, (255, 255, 255), (WIDTH//2 - 5, (i + line_y) % HEIGHT, 10, 20))
-    car2_size = 40
+    
+    car2_width = 50
+    car2_height = 100
     car2_speed = 6
 
     # === SPAWN OBS ===
     obs_timer += 1
     if obs_timer >= 40:
-        car2_x = random.randint(0, WIDTH - car2_size)
-        car2_y = -car2_size
+        car2_x = random.randint(0, WIDTH - car2_width)
+        car2_y = -car2_height
         obs_timer=0
-        obs_list.append(Car2(screen, color=(232, 123, 0), speed=car2_speed, size=car2_size, x=car2_x, y=car2_y))
+        obs_list.append(Car2(color=(232, 123, 0), speed=car2_speed, width=car2_width, height=car2_height, x=car2_x, y=car2_y, image_path=ENEMY_IMG))
 
     # === SỰ KIỆN ===
     for event in pygame.event.get():
@@ -84,8 +90,8 @@ while running:
                 # RESET GAME
                 score = 0
                 game_over = False
-                player.x = WIDTH//2 - car_size//2
-                player.y = HEIGHT - car_size - 10
+                player.x = WIDTH//2 - car_width//2
+                player.y = HEIGHT - car_height - 10
                 obs_list.clear()
 
     if not game_over:
@@ -93,11 +99,11 @@ while running:
         keys = pygame.key.get_pressed()
         if keys[pygame.K_a] and player.x > 0:
             player.update("trai")
-        if keys[pygame.K_d] and player.x < WIDTH - car_size:
+        if keys[pygame.K_d] and player.x < WIDTH - car_width:
             player.update("phai")
         if keys[pygame.K_w] and player.y > 0:
             player.update("len")
-        if keys[pygame.K_s] and player.y < HEIGHT - car_size:
+        if keys[pygame.K_s] and player.y < HEIGHT - car_height:
             player.update("xuong")
 
         # === UPDATE XE ĐỊCH ===
@@ -108,9 +114,9 @@ while running:
                 score += 1
 
         # === VA CHẠM ===
-        player_rect = pygame.Rect(player.x, player.y, player.size, player.size)
+        player_rect = pygame.Rect(player.x + player.width // 2, player.y, player.width, player.height - 15)
         for car2 in obs_list:
-            obs_rect = pygame.Rect(car2.x, car2.y, car2.size, car2.size)
+            obs_rect = pygame.Rect(car2.x + car2.width // 2, car2.y, car2.width, car2.height - 15)
             if player_rect.colliderect(obs_rect):
                 if score > highscore:
                     highscore = score
