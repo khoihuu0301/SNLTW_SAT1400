@@ -1,5 +1,6 @@
 import pygame
 import math
+import random
 
 pygame.init()
 font = pygame.font.SysFont(None, 30)
@@ -60,21 +61,26 @@ class Basket:
     #Yvuong=Ytron + radius 
     # Xvuong + Xtron < Xvuong + radius
 class Ball:
-     def __init__(self,x,y,speed):
+    def __init__(self,x,y,speed):
         self.radius = 10
         self.x = x
         self.y=y
         self.speed=speed     
-     def draw(self, surface):
+    def draw(self, surface):
         pygame.draw.circle(surface, "RED", (self.x, self.y), self.radius)
-     def move(self):
+    def move(self):
        self.y += self.speed
-    #  def is_caught_by(self, basket: Basket):
-    #     return (
-    #         basket.y <= self.y + self.radius <= basket.y + basket.height and
-    #         basket.x <= self.x <= basket.x + basket.width
-    #     )
+    def is_caught_by(self, basket: Basket):
+        return (
+            basket.y <= self.y + self.radius <= basket.y + basket.height and
+            basket.x <= self.x <= basket.x + basket.width
+        )
 
+    def reset(self):
+        self.x = random.randint(0 + self.radius, WIDTH - self.radius)
+        self.y = 0
+    def change_speed(self,speed):
+        self.speed = speed
     #  def points (self):
     #     basket_rect= pygame.Rect(self.x,self.y,basket.size,basket.size )
     #     dist_x = abs(ball.x - basket_rect.centerx)
@@ -83,7 +89,8 @@ class Ball:
     #         font = pygame.font.SysFont(None, 48)
     #         text = font.render("Game Over!", True, (255,0,0))
 basket = Basket()
-ball = Ball()
+ball_speed=2
+ball = Ball(x=250,y=0,speed=ball_speed)
 score = 0
 running = True
 clock = pygame.time.Clock()
@@ -101,16 +108,28 @@ def draw_game():
 while running:
     clock.tick(60)
     keys = pygame.key.get_pressed()
-
+    ball.move()
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-            basket.move(keys)
+            basket.move()
             ball.move()
+    keys = pygame.key.get_pressed()
+    dx=0
+    if keys[pygame.K_LEFT]:
+        dx= -1
+    if keys[pygame.K_RIGHT]:
+        dx= 1
+    basket.move(dx)
+        
+            
             
             
     if ball.is_caught_by(basket):
         score += 1
+        if score % 5 == 0:
+            ball_speed +=1
+            ball.change_speed(ball_speed)
         ball.reset()
 
     if ball.y > HEIGHT:
