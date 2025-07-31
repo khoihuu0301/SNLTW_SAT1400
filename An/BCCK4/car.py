@@ -1,15 +1,31 @@
 import pygame
 class Car:
-    def __init__(self, color, speed, size, x, y):
+    def __init__(self, color, speed, width, height, x, y,image_path=None):
         self.color = color
         self.speed = speed
-        self.size = size
+        self.width = width
+        self.height = height 
         self.x = x
         self.y = y
+
+        if image_path:
+            self.image = pygame.image.load(image_path).convert_alpha()
+            self.image = pygame.transform.scale(self.image, (height, height))
+        else:
+            self.image = None
+
     def draw( self, surface):
-        pygame.draw.rect(surface, (0, 200, 255), (self.x, self.y, self.size, self.size))
+        # pygame.draw.rect(surface, (0, 200, 255), (self.x, self.y, self.size, self.size))
+        # if self.image:
+        #     surface.blit(self.image, (self.x, self.y))
+        # else:
+        #     pygame.draw.rect(surface, (0, 200, 255), (self.x + self.width // 2, self.y, self.width, self.height))
+        surface.blit(self.image, (self.x, self.y - 15))    
+        pygame.draw.rect(surface, (0, 200, 255), (self.x + self.width // 2, self.y, self.width - 5, self.height - 30), width=2)
     
-    speed = 1 
+    speed = 1
+
+
 
 
     def update(self, direction):
@@ -26,15 +42,21 @@ class Car:
 
 
 class Car2:
-    def __init__(self, surface,color, speed, size, x, y):
+    def __init__(self, color, speed, width, height, x, y,image_path=None):
         self.color = color
         self.speed = speed
-        self.size = size
+        self.width = width
+        self.height = height
         self.x = x
         self.y = y
-        self.draw(surface)
+        # self.draw(surface)
+
+        if image_path:
+            self.image = pygame.image.load(image_path).convert_alpha()
+            self.image = pygame.transform.scale(self.image, (height, height))
+        else:
+            self.image = None
+
     def draw( self, surface):
-        pygame.draw.rect(surface, (232, 123, 0), (self.x, self.y, self.size, self.size))
-    
-    speed = 1 
-    x,y =0,0
+        surface.blit(self.image, (self.x, self.y - 15))    
+        pygame.draw.rect(surface, (0, 200, 255), (self.x + self.width // 2, self.y, self.width - 5, self.height - 30), width=2)
