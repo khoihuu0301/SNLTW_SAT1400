@@ -6,10 +6,21 @@ from car import Car, Car2
 
 # === SETUP ===
 pygame.init()
+pygame.mixer.init()
 WIDTH, HEIGHT = 500, 700
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("F1 Street Dodger")
 clock = pygame.time.Clock()
+
+# === SOUNDS ===
+sound = pygame.mixer.Sound(r'C:\Users\Teky Binh Thanh\Desktop\BCCK4\metal-pipe.mp3')
+sound.set_volume(0.5)
+
+pygame.mixer.music.load(r'C:\Users\Teky Binh Thanh\Desktop\BCCK4\racing-speed-gaming-music.mp3')
+pygame.mixer.music.set_volume(1)
+pygame.mixer.music.play(-1)
+
+# pygame.mixer.music.load()
 
 # === FONT & FILE ===
 font = pygame.font.SysFont(None, 36)
@@ -68,8 +79,8 @@ while running:
     for i in range(0, HEIGHT, 40):
         pygame.draw.rect(screen, (255, 255, 255), (WIDTH//2 - 5, (i + line_y) % HEIGHT, 10, 20))
     
-    car2_width = 50
-    car2_height = 100
+    car2_width = 75
+    car2_height = 130
     car2_speed = 6
 
     # === SPAWN OBS ===
@@ -116,8 +127,10 @@ while running:
         # === VA CHẠM ===
         player_rect = pygame.Rect(player.x + player.width // 2, player.y, player.width, player.height - 15)
         for car2 in obs_list:
-            obs_rect = pygame.Rect(car2.x + car2.width // 2, car2.y, car2.width, car2.height - 15)
+            obs_rect = pygame.Rect(car2.x + 45, car2.y + 11, car2.width - 40, car2.height - 55)
+            # pygame.draw.rect(screen, (255, 255, 255), obs_rect, width=2)
             if player_rect.colliderect(obs_rect):
+                sound.play()
                 if score > highscore:
                     highscore = score
                     with open(HS_FILE, "w") as f:
