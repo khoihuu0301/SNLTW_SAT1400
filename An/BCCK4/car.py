@@ -21,7 +21,7 @@ class Car:
         # else:
         #     pygame.draw.rect(surface, (0, 200, 255), (self.x + self.width // 2, self.y, self.width, self.height))
         surface.blit(self.image, (self.x, self.y - 15))    
-        pygame.draw.rect(surface, (0, 200, 255), (self.x + self.width // 2, self.y, self.width - 5, self.height - 30), width=2)
+        # pygame.draw.rect(surface, (0, 200, 255), (self.x + self.width // 2, self.y, self.width - 5, self.height - 30), width=2)
     
     speed = 1
 
@@ -59,4 +59,5 @@ class Car2:
 
     def draw( self, surface):
         surface.blit(self.image, (self.x, self.y - 15))    
-        pygame.draw.rect(surface, (0, 200, 255), (self.x + self.width // 2, self.y, self.width - 5, self.height - 30), width=2)
+        # pygame.draw.rect(surface, (0, 200, 255), (self.x + self.width // 2, self.y, self.width, self.height - 15), width=2)
+                            # obs_rect = pygame.Rect(car2.x + car2.width // 2, car2.y, car2.width, car2.height - 15)
